@@ -1,0 +1,8 @@
+accessWidener v1 named
+
+accessible class net/minecraft/client/texture/PlayerSkinProvider$FileCache
+accessible class net/minecraft/client/particle/FireworksSparkParticle$Explosion
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractAtHandler
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler
+accessible class net/minecraft/client/world/ClientChunkManager$ClientChunkMap

@@ -1,0 +1,9 @@
+{
+  "required": false,
+  "package": "me.lordpvp.phantomware.mixin.sodium",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "me.lordpvp.phantomware.mixin.MixinPlugin",
+  "client": [
+    "MixinSodiumWorldRenderer"
+  ]
+}

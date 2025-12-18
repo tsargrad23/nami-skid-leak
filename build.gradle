@@ -1,0 +1,118 @@
+plugins {
+    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'maven-publish'
+    id 'me.lordpvp.phantomware.' version '8.1.2'
+}
+
+
+group = "me.lordpvp"
+archivesBaseName = "phantomware"
+def getGitHash() {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+        ignoreExitValue true
+    }
+    return stdout.toString().trim()
+}
+
+def getLastTag() {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'describe', '--tags', '--abbrev=0'
+        standardOutput = stdout
+        ignoreExitValue true
+    }
+    return stdout.toString().trim()
+}
+
+def getCommitsCount() {
+    def tag = getLastTag()
+    if (!tag) return "0"
+
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-list', '--count', "${tag}..HEAD"
+        standardOutput = stdout
+        ignoreExitValue true
+    }
+    return stdout.toString().trim()
+}
+
+def getGitBranch() {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
+        standardOutput = stdout
+        ignoreExitValue true
+    }
+    return stdout.toString().trim()
+}
+
+
+version = "2.4.5_mc${getGitBranch()}_${getCommitsCount()}_${getGitHash()}"
+//version = "2.4.5_mc${getGitBranch()}"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    maven { url = 'https://maven.fabricmc.net/' }
+    maven { url = 'https://repo.spongepowered.org/maven' }
+    maven {
+        url = uri("https://api.modrinth.com/maven")
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
+    maven { url "https://jitpack.io" }
+}
+
+configurations {
+    shadowDeps
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:1.21.8"
+    mappings "net.fabricmc:yarn:1.21.8+build.1"
+    modImplementation "net.fabricmc:fabric-loader:0.16.14"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.129.0+1.21.8"
+    modImplementation("maven.modrinth:sodium:mc1.21.6-0.6.13-fabric") { transitive = false }
+    modImplementation ("com.github.cattyngmd.catformat:catformat-core:2.1.0")
+
+    shadowDeps project.configurations.modImplementation.filter {
+        it.name.contains("catformat-core")
+    }
+}
+loom {
+    accessWidenerPath = file("src/main/resources/META-INF/nami.accesswidener")
+}
+
+tasks.processResources {
+    inputs.property("version", project.version)
+    filesMatching("fabric.mod.json") {
+        expand("version": project.version)
+    }
+}
+
+shadowJar {
+    archiveBaseName.set("nami-unremapped")
+    archiveClassifier.set("")
+    archiveVersion.set(project.version)
+
+    from(sourceSets.main.output)
+
+    configurations = [project.configurations.shadowDeps]
+}
+
+tasks.build {
+    dependsOn tasks.shadowJar
+}
+
+tasks.named("remapJar") {
+    dependsOn tasks.named("shadowJar")
+    input.set(tasks.named("shadowJar").flatMap { it.archiveFile })
+}

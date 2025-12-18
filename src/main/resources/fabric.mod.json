@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "phantomware",
+  "version": "${version}",
+  "name": "PhantomWareBeta",
+  "description": "A high-performance, modular client base for anarchy servers.",
+  "authors": ["Kiriyaga"],
+  "contact": {
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "me.lordpvp.phantomware.PhantomWare"
+    ]
+  },
+  "mixins": [
+    "nami.mixins.json",
+    "nami.sodium.mixins.json"
+  ],
+  "accessWidener": "META-INF/phantomware.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "fabric": "*",
+    "minecraft": "1.21.8"
+  }
+}
